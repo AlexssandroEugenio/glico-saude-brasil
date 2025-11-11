@@ -1,4 +1,4 @@
-import { Home, Activity, TrendingUp, Crown } from "lucide-react";
+import { Home, Activity, TrendingUp, Crown, User } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 
 export const BottomNav = () => {
@@ -39,6 +39,15 @@ export const BottomNav = () => {
         >
           <Crown className="h-5 w-5" />
           <span className="text-xs">Premium</span>
+        </NavLink>
+        
+        <NavLink
+          to="/perfil"
+          className="flex flex-col items-center justify-center flex-1 h-full gap-1 text-muted-foreground hover:text-primary transition-colors"
+          activeClassName="text-primary font-medium"
+        >
+          <User className="h-5 w-5" />
+          <span className="text-xs">Perfil</span>
         </NavLink>
       </div>
     </nav>

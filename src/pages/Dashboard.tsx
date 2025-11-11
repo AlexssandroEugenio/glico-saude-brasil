@@ -3,9 +3,29 @@ import { Button } from "@/components/ui/button";
 import { GlucoseCard } from "@/components/GlucoseCard";
 import { StatCard } from "@/components/StatCard";
 import { useNavigate } from "react-router-dom";
+import { useUserProfile } from "@/hooks/useUserProfile";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { profile } = useUserProfile();
+
+  const getDiabetesTypeLabel = () => {
+    if (!profile?.diabetesType) return '';
+    const types: Record<string, string> = {
+      tipo1: 'Diabetes Tipo 1',
+      tipo2: 'Diabetes Tipo 2',
+      gestacional: 'Diabetes Gestacional',
+      'pre-diabetes': 'Pré-diabetes',
+    };
+    return types[profile.diabetesType] || '';
+  };
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Bom dia';
+    if (hour < 18) return 'Boa tarde';
+    return 'Boa noite';
+  };
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -13,7 +33,12 @@ const Dashboard = () => {
       <header className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground p-6 rounded-b-3xl shadow-[var(--shadow-elevated)]">
         <div className="max-w-screen-lg mx-auto">
           <h1 className="text-2xl font-bold mb-1">GlicoSaúde</h1>
-          <p className="text-sm opacity-90">Bem-vindo de volta! 👋</p>
+          <p className="text-sm opacity-90">
+            {profile?.name ? `${getGreeting()}, ${profile.name}! 👋` : 'Bem-vindo de volta! 👋'}
+          </p>
+          {profile?.diabetesType && (
+            <p className="text-xs opacity-75 mt-1">{getDiabetesTypeLabel()}</p>
+          )}
         </div>
       </header>
 
