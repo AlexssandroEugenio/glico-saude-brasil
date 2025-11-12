@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useUserProfile, UserProfile } from "@/hooks/useUserProfile";
 import { User, Save, Trash2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -22,12 +22,16 @@ import {
 const Perfil = () => {
   const navigate = useNavigate();
   const { profile, updateProfile, clearProfile } = useUserProfile();
-  const [formData, setFormData] = useState(profile);
+  const [formData, setFormData] = useState<UserProfile | null>(profile);
 
-  const updateField = (field: string, value: any) => {
-    if (formData) {
-      setFormData(prev => prev ? { ...prev, [field]: value } : prev);
+  useEffect(() => {
+    if (profile) {
+      setFormData(profile);
     }
+  }, [profile]);
+
+  const updateField = (field: keyof UserProfile, value: any) => {
+    setFormData(prev => prev ? { ...prev, [field]: value } : prev);
   };
 
   const handleSave = () => {
@@ -49,7 +53,7 @@ const Perfil = () => {
     navigate('/onboarding');
   };
 
-  if (!profile) {
+  if (!profile || !formData) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <div className="text-center">
