@@ -28,7 +28,29 @@ const Onboarding = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const validateStep1 = () => {
+    return formData.name && formData.name.trim() !== '' && formData.age && formData.age > 0;
+  };
+
+  const validateStep2 = () => {
+    return formData.diagnosisYears !== undefined && formData.diagnosisYears >= 0;
+  };
+
+  const canProceed = () => {
+    if (step === 1) return validateStep1();
+    if (step === 2) return validateStep2();
+    return true; // Etapa 3 sempre permite prosseguir (todos têm valores padrão)
+  };
+
   const nextStep = () => {
+    if (!canProceed()) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Por favor, preencha todos os campos obrigatórios (*) antes de continuar.",
+        variant: "destructive",
+      });
+      return;
+    }
     if (step < 3) setStep(step + 1);
   };
 
@@ -37,6 +59,14 @@ const Onboarding = () => {
   };
 
   const handleComplete = () => {
+    if (!canProceed()) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Por favor, preencha todos os campos obrigatórios (*) antes de concluir.",
+        variant: "destructive",
+      });
+      return;
+    }
     const completeProfile: UserProfile = {
       name: formData.name || '',
       age: formData.age || 0,
@@ -60,7 +90,7 @@ const Onboarding = () => {
       title: "Configurações salvas!",
       description: "Seu GlicoSaúde foi personalizado com base no seu perfil.",
     });
-    navigate('/');
+    window.location.href = '/';
   };
 
   const progressValue = (step / 3) * 100;
@@ -341,11 +371,19 @@ const Onboarding = () => {
             </Button>
           )}
           {step < 3 ? (
-            <Button onClick={nextStep} className="flex-1">
+            <Button 
+              onClick={nextStep} 
+              className="flex-1"
+              disabled={!canProceed()}
+            >
               Próximo
             </Button>
           ) : (
-            <Button onClick={handleComplete} className="flex-1 bg-success hover:bg-success/90">
+            <Button 
+              onClick={handleComplete} 
+              className="flex-1 bg-success hover:bg-success/90"
+              disabled={!canProceed()}
+            >
               Concluir
             </Button>
           )}
