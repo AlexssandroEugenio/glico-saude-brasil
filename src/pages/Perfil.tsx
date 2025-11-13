@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useUserProfile, UserProfile } from "@/hooks/useUserProfile";
-import { User, Save, Trash2 } from "lucide-react";
+import { User, Save, Trash2, Download, CheckCircle2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import {
@@ -18,10 +18,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Card } from "@/components/ui/card";
+import { usePWAInstall } from "@/hooks/usePWAInstall";
 
 const Perfil = () => {
   const navigate = useNavigate();
   const { profile, updateProfile, clearProfile } = useUserProfile();
+  const { isInstalled } = usePWAInstall();
   const [formData, setFormData] = useState<UserProfile | null>(profile);
 
   useEffect(() => {
@@ -234,6 +237,40 @@ const Perfil = () => {
             <Save className="h-4 w-4 mr-2" />
             Salvar Alterações
           </Button>
+
+          {/* Instalação PWA */}
+          <Card className="p-6 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/10">
+            <div className="flex items-start gap-4">
+              <div className={`p-3 rounded-full ${isInstalled ? 'bg-green-500/10' : 'bg-primary/10'}`}>
+                {isInstalled ? (
+                  <CheckCircle2 className="h-6 w-6 text-green-600" />
+                ) : (
+                  <Download className="h-6 w-6 text-primary" />
+                )}
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-foreground mb-1">
+                  {isInstalled ? '✅ App Instalado' : '📲 Instalar Aplicativo'}
+                </h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  {isInstalled 
+                    ? 'O GlicoSaúde está instalado na tela inicial do seu dispositivo'
+                    : 'Adicione o GlicoSaúde à tela inicial para acesso rápido e offline'
+                  }
+                </p>
+                {!isInstalled && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate('/instalar')}
+                    className="border-primary/20 hover:bg-primary/5"
+                  >
+                    Ver instruções de instalação
+                  </Button>
+                )}
+              </div>
+            </div>
+          </Card>
 
           <AlertDialog>
             <AlertDialogTrigger asChild>

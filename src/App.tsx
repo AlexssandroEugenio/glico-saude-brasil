@@ -11,6 +11,7 @@ import Premium from "./pages/Premium";
 import Perfil from "./pages/Perfil";
 import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
+import Instalar from "./pages/Instalar";
 import { useUserProfile } from "@/hooks/useUserProfile";
 
 const AppRoutes = () => {
@@ -35,6 +36,7 @@ const AppRoutes = () => {
         {needsOnboarding ? (
           <>
             <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/instalar" element={<Instalar />} />
             <Route path="*" element={<Navigate to="/onboarding" replace />} />
           </>
         ) : (
@@ -44,6 +46,7 @@ const AppRoutes = () => {
             <Route path="/historico" element={<Historico />} />
             <Route path="/premium" element={<Premium />} />
             <Route path="/perfil" element={<Perfil />} />
+            <Route path="/instalar" element={<Instalar />} />
             <Route path="/onboarding" element={<Navigate to="/" replace />} />
             <Route path="*" element={<NotFound />} />
           </>
