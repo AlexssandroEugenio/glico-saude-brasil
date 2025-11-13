@@ -1,13 +1,29 @@
-import { Activity, TrendingUp, Calendar, Target } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Activity, TrendingUp, Calendar, Target, Download, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlucoseCard } from "@/components/GlucoseCard";
 import { StatCard } from "@/components/StatCard";
 import { useNavigate } from "react-router-dom";
 import { useUserProfile } from "@/hooks/useUserProfile";
+import { usePWAInstall } from "@/hooks/usePWAInstall";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { profile } = useUserProfile();
+  const { isInstalled } = usePWAInstall();
+  const [showInstallBanner, setShowInstallBanner] = useState(false);
+
+  useEffect(() => {
+    const bannerDismissed = localStorage.getItem('pwa_install_banner_dismissed');
+    if (!isInstalled && !bannerDismissed) {
+      setShowInstallBanner(true);
+    }
+  }, [isInstalled]);
+
+  const handleDismissBanner = () => {
+    localStorage.setItem('pwa_install_banner_dismissed', 'true');
+    setShowInstallBanner(false);
+  };
 
   const getDiabetesTypeLabel = () => {
     if (!profile?.diabetesType) return '';
@@ -41,6 +57,41 @@ const Dashboard = () => {
           )}
         </div>
       </header>
+
+      {/* Banner de instalação PWA */}
+      {showInstallBanner && (
+        <div className="max-w-screen-lg mx-auto px-4 pt-4 animate-fade-in">
+          <div className="bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 rounded-xl p-4 flex items-center gap-3 shadow-sm">
+            <div className="bg-primary text-primary-foreground p-2 rounded-lg flex-shrink-0">
+              <Download className="h-5 w-5" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-foreground">
+                💡 Instale o app para acesso mais rápido!
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Adicione à tela inicial e use offline
+              </p>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/instalar")}
+              className="text-primary hover:text-primary/90 font-semibold flex-shrink-0"
+            >
+              Como instalar →
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleDismissBanner}
+              className="flex-shrink-0 h-8 w-8"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
 
       <main className="max-w-screen-lg mx-auto px-4 pt-6 space-y-6">
         {/* Quick Stats */}
