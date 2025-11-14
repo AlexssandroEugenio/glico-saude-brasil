@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useGlucoseReadings } from "@/hooks/useGlucoseReadings";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Activity } from "lucide-react";
 
@@ -13,6 +14,7 @@ const Registro = () => {
   const [type, setType] = useState<string>("");
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { insertReading, isInserting } = useGlucoseReadings();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,14 +28,26 @@ const Registro = () => {
       return;
     }
 
-    // Here would be the logic to save the reading
-    toast({
-      title: "Medição registrada!",
-      description: `Glicose: ${glucose} mg/dL (${type})`,
+    const glucoseValue = parseInt(glucose);
+    if (glucoseValue <= 0 || glucoseValue >= 600) {
+      toast({
+        title: "Valor inválido",
+        description: "O valor da glicemia deve estar entre 1 e 599 mg/dL.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    insertReading({
+      glucose_value: glucoseValue,
+      measurement_type: type as 'fasting' | 'postprandial' | 'random',
+      measured_at: new Date().toISOString(),
     });
 
     setGlucose("");
     setType("");
+    
+    setTimeout(() => navigate("/historico"), 1000);
   };
 
   return (
@@ -91,9 +105,13 @@ const Registro = () => {
               </div>
 
               <div className="pt-4 space-y-3">
-                <Button type="submit" className="w-full h-12 text-base bg-primary hover:bg-primary/90">
-                  Registrar Medição
-                </Button>
+              <Button 
+                type="submit" 
+                className="w-full h-12 text-base bg-primary hover:bg-primary/90"
+                disabled={isInserting}
+              >
+                {isInserting ? "Salvando..." : "Registrar Medição"}
+              </Button>
                 <Button
                   type="button"
                   variant="outline"
