@@ -4,8 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useUserProfile, UserProfile } from "@/hooks/useUserProfile";
-import { User, Save, Trash2, Download, CheckCircle2 } from "lucide-react";
+import { User, Save, Trash2, Download, CheckCircle2, LogOut } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import {
   AlertDialog,
@@ -25,6 +26,7 @@ const Perfil = () => {
   const navigate = useNavigate();
   const { profile, updateProfile, clearProfile } = useUserProfile();
   const { isInstalled } = usePWAInstall();
+  const { signOut, user } = useAuth();
   const [formData, setFormData] = useState<UserProfile | null>(profile);
 
   useEffect(() => {
@@ -47,13 +49,30 @@ const Perfil = () => {
     }
   };
 
-  const handleClearProfile = () => {
-    clearProfile();
+  const handleClearProfile = async () => {
+    await clearProfile();
     toast({
       title: "Perfil excluído",
       description: "Seus dados foram removidos do dispositivo.",
     });
     navigate('/onboarding');
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Logout realizado",
+        description: "Você saiu da sua conta.",
+      });
+      navigate("/auth");
+    } catch (error) {
+      toast({
+        title: "Erro ao fazer logout",
+        description: "Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (!profile || !formData) {
